@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const fs = require('fs').promises;
+const path = require('path');
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,6 +14,19 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+app.get('/talker', async (_req, res) => {
+  const pathTalker = path.resolve(__dirname, '..', 'src', 'talker.json');
+  const managers = JSON.parse(await fs.readFile(pathTalker, 'utf8'));
+  console.log(managers);
+  res.status(200).json(managers);
+});
+
+app.post('/talker', (req, res) => {
+  const managers = { ...req.body };
+  console.log(managers);
+  res.end();
+});
+
 app.listen(PORT, () => {
-  console.log('Online')
+  console.log('Online');
 });
