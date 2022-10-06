@@ -1,12 +1,11 @@
 module.exports = function autenticPass(req, res, next) {
   const passwordPost = req.body.password;
-  console.log('emailPost ', passwordPost);
   
   if (!passwordPost) {
-    return res.status(400).json({ message: 'O campo \"password\" é obrigatório' });
+    return res.status(400).json({ message: 'O campo "password" é obrigatório' });
   }
   if (passwordPost.length < 6) {
-    return res.status(400).json({ message: 'O \"password\" deve ter pelo menos 6 caracteres' });
+    return res.status(400).json({ message: 'O "password" deve ter pelo menos 6 caracteres' });
   }
   next();
 };
