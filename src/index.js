@@ -4,8 +4,9 @@ const crypto = require('crypto');
 
 const fs = require('fs').promises;
 const path = require('path');
-// const { isNumberObject } = require('util/types');
 const talkerData = require('./talker.json');
+const autenticEmail = require('./middleware/autenticEmail');
+const autenticPass = require('./middleware/autenticPass');
 
 const app = express();
 
@@ -39,11 +40,10 @@ app.get('/talker/:id', (req, res) => {
   }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login', autenticEmail, autenticPass, async (req, res) => {
   // https://www.geeksforgeeks.org/node-js-crypto-randombytes-method/
   crypto.randomBytes(8, async (err, buf) => {
     if (err) {
-      console.log(`log de erro: ${err}`);
       return err;
     } 
       const mytoken = await buf.toString('hex');
