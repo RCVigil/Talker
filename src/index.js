@@ -7,6 +7,12 @@ const path = require('path');
 const talkerData = require('./talker.json');
 const autenticEmail = require('./middleware/autenticEmail');
 const autenticPass = require('./middleware/autenticPass');
+const validatingSpeaker = require('./middleware/autenticSpeaker');
+const validatingToken = require('./middleware/autenticToken');
+const validatingAge = require('./middleware/autenticAge');
+const validatingT = require('./middleware/autenticTalk');
+const validatingWatch = require('./middleware/autenticWatch');
+const validatingRate = require('./middleware/autenticRate');
 
 const app = express();
 
@@ -33,6 +39,7 @@ app.get('/talker', async (_req, res) => {
 app.get('/talker/:id', (req, res) => {
   const idPar = Number(req.params.id);
   const manager = talkerData.find((e) => e.id === idPar);
+  console.log(req.headers);
   if (!manager) {
     res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   } else {
@@ -45,14 +52,32 @@ app.post('/login', autenticEmail, autenticPass, async (req, res) => {
   crypto.randomBytes(8, async (err, buf) => {
     if (err) {
       return err;
-    } 
-      const mytoken = await buf.toString('hex');
-      passToken = { token: `${mytoken}` };
-      return passToken;
+    }
+    const mytoken = await buf.toString('hex');
+    passToken = { token: `${mytoken}` };
+    return passToken;
   });
   res.status(200).json(passToken);
 });
 
+app.post(
+  '/talker',
+  validatingToken,
+  validatingSpeaker,
+  validatingAge,
+  validatingT,
+  validatingWatch,
+  validatingRate,
+  async (req, res) => {
+    const talker = JSON.parse(await fs.readFile(pathTalker, 'utf-8'));
+
+    const newTalker = { id: talker.length + 1, ...req.body };
+
+    talker.push(newTalker);
+    await fs.writeFile(pathTalker, JSON.stringify(talker));
+    res.status(201).json(newTalker);
+  },
+);
 app.listen(PORT, () => {
   console.log('Online');
 });
