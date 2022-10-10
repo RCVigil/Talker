@@ -39,7 +39,6 @@ app.get('/talker', async (_req, res) => {
 app.get('/talker/:id', (req, res) => {
   const idPar = Number(req.params.id);
   const manager = talkerData.find((e) => e.id === idPar);
-  console.log(req.headers);
   if (!manager) {
     res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   } else {
@@ -78,6 +77,18 @@ app.post(
     res.status(201).json(newTalker);
   },
 );
+
+app.delete('/talker/:id', validatingToken, async (req, res) => {
+    const talker = JSON.parse(await fs.readFile(pathTalker, 'utf-8'));
+    const { id } = req.params;
+    const talkerPerson = talker.filter((el) => el.id === Number(id))
+    const deleteTalker = (talker.splice(talkerPerson, 1));
+    console.log(deleteTalker);
+
+    await fs.writeFile(pathTalker, JSON.stringify(deleteTalker));
+    res.status(204).json(deleteTalker);
+  });
+
 app.listen(PORT, () => {
   console.log('Online');
 });
