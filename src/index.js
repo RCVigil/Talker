@@ -81,7 +81,7 @@ app.post(
 app.delete('/talker/:id', validatingToken, async (req, res) => {
     const talker = JSON.parse(await fs.readFile(pathTalker, 'utf-8'));
     const { id } = req.params;
-    const talkerPerson = talker.filter((el) => el.id === Number(id))
+    const talkerPerson = talker.filter((el) => el.id === Number(id));
     const deleteTalker = (talker.splice(talkerPerson, 1));
     console.log(deleteTalker);
 
