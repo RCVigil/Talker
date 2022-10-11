@@ -78,12 +78,33 @@ app.post(
   },
 );
 
+app.put('/talker/:id', validatingToken, validatingSpeaker, validatingAge,
+  validatingT, validatingWatch, validatingRate, async (req, res) => {
+  const talker = JSON.parse(await fs.readFile(pathTalker, 'utf-8'));
+  const { id } = req.params;
+  const { name, age } = req.body;
+  const { watchedAt, rate } = req.body.talk;
+  let upDatedTalker;
+  for (let index = 0; index < talker.length; index += 1) {
+    const person = talker[index];
+    if (person.id === Number(id)) {
+      person.name = name;
+      person.age = age;
+      person.talk.watchedAt = watchedAt;
+      person.talk.rate = rate;
+      upDatedTalker = person;
+    } 
+}
+    talker.push(upDatedTalker);
+    await fs.writeFile(pathTalker, JSON.stringify(talker));
+  res.status(200).json(upDatedTalker);
+});
+
 app.delete('/talker/:id', validatingToken, async (req, res) => {
     const talker = JSON.parse(await fs.readFile(pathTalker, 'utf-8'));
     const { id } = req.params;
     const talkerPerson = talker.filter((el) => el.id === Number(id));
     const deleteTalker = (talker.splice(talkerPerson, 1));
-    console.log(deleteTalker);
 
     await fs.writeFile(pathTalker, JSON.stringify(deleteTalker));
     res.status(204).json(deleteTalker);
