@@ -36,6 +36,17 @@ app.get('/talker', async (_req, res) => {
   res.status(200).json(managers);
 });
 
+app.get('/talker/search?', validatingToken, async (req, res) => {
+  const talker = JSON.parse(await fs.readFile(pathTalker, 'utf-8'));
+  const text = req.query;
+  if (!text) return res.status(400).json({ message: 'NOT FOUND' });
+  const result = talker.filter((person) =>
+    person.name.includes(text.q));
+  console.log('Result é = ', result);
+  if (result.length === 0) return res.status(400).json({ message: 'TEXT NOT FOUND' });
+  res.status(200).json(result);
+});
+
 app.get('/talker/:id', (req, res) => {
   const idPar = Number(req.params.id);
   const manager = talkerData.find((e) => e.id === idPar);
@@ -59,24 +70,14 @@ app.post('/login', autenticEmail, autenticPass, async (req, res) => {
   res.status(200).json(passToken);
 });
 
-app.post(
-  '/talker',
-  validatingToken,
-  validatingSpeaker,
-  validatingAge,
-  validatingT,
-  validatingWatch,
-  validatingRate,
-  async (req, res) => {
+app.post('/talker', validatingToken, validatingSpeaker, validatingAge,
+  validatingT, validatingWatch, validatingRate, async (req, res) => {
     const talker = JSON.parse(await fs.readFile(pathTalker, 'utf-8'));
-
     const newTalker = { id: talker.length + 1, ...req.body };
-
     talker.push(newTalker);
     await fs.writeFile(pathTalker, JSON.stringify(talker));
     res.status(201).json(newTalker);
-  },
-);
+  });
 
 app.put('/talker/:id', validatingToken, validatingSpeaker, validatingAge,
   validatingT, validatingWatch, validatingRate, async (req, res) => {
